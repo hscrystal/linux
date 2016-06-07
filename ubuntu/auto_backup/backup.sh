@@ -28,7 +28,8 @@ TEMP_MONGO=$(mktemp -d /tmp/mongo.XXXXXXXX)
 ### Backup Directory files
 if [ -d "$PATH_FILES" ]; then
   rsync -a $PATH_FILES $TEMP_FILES
-  tar -czf $BACKUP_DIR/files.tar.gz -C $TEMP_FILES/ .
+  #tar -czf $BACKUP_DIR/files.tar.gz -C $TEMP_FILES/ .
+  tar -cjf $BACKUP_DIR/files.tar.bz2 -C $TEMP_FILES/ .
   [ -d $TEMP_FILES ] && rm -r $TEMP_FILES
   echo "!!!Backup Files Completed"
 else
@@ -38,7 +39,8 @@ fi
 ### Backup Directory web
 if [ -d "$PATH_WEB" ]; then
   rsync -a $PATH_WEB $TEMP_WEB
-  tar -czf $BACKUP_DIR/web.tar.gz -C $TEMP_WEB/ .
+  #tar -czf $BACKUP_DIR/web.tar.gz -C $TEMP_WEB/ .
+  tar -cjf $BACKUP_DIR/web.tar.bz2 -C $TEMP_WEB/ .
   [ -d $TEMP_WEB ] && rm -r $TEMP_WEB
   echo "!!!Backup Web Completed"
 else
@@ -47,7 +49,8 @@ fi
 
 ### Backup MYSQL DB
 if which mysqldump >/dev/null; then
-  mysqldump --routines --events -h $HOST -P $PORT_MYSQL -u $USER_MYSQL -p$PASS_MYSQL --all-databases | gzip -9 > $BACKUP_DIR/mysql.sql.gz
+  #mysqldump --routines --events -h $HOST -P $PORT_MYSQL -u $USER_MYSQL -p$PASS_MYSQL --all-databases | gzip -9 > $BACKUP_DIR/mysql.sql.gz
+  mysqldump --routines --events -h $HOST -P $PORT_MYSQL -u $USER_MYSQL -p$PASS_MYSQL --all-databases | bzip2 > $BACKUP_DIR/mysql.sql.bz2
   if [ $? -ne 0 ]; then
       echo "!!!Failed Mysqldump to Backup"
   else
@@ -63,7 +66,8 @@ if which mongodump >/dev/null; then
   if [ $? -ne 0 ]; then
       echo "!!!Failed Mongodump to Backup"
   fi
-  tar -czf $BACKUP_DIR/mongo.tar.gz -C $TEMP_MONGO/ .
+  #tar -czf $BACKUP_DIR/mongo.tar.gz -C $TEMP_MONGO/ .
+  tar -cjf $BACKUP_DIR/mongo.tar.bz2 -C $TEMP_MONGO/ .
   [ -d $TEMP_MONGO ] && rm -rf $TEMP_MONGO
   echo "!!!Backup MONGO Completed"
 else
